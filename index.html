@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Daily Slideshow</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+    <script>
+        function refreshAt(hours, minutes, seconds) {
+            var now = new Date();
+            var then = new Date();
+
+            if(now.getHours() > hours ||
+               (now.getHours() == hours && now.getMinutes() > minutes) ||
+                (now.getHours() == hours && now.getMinutes() == minutes && now.getSeconds() >= seconds)) {
+                then.setDate(now.getDate() + 1);
+            }
+            then.setHours(hours);
+            then.setMinutes(minutes);
+            then.setSeconds(seconds);
+
+            var timeout = (then.getTime() - now.getTime());
+            setTimeout(function() { 
+                document.getElementById('slideshow').src = document.getElementById('slideshow').src;
+            }, timeout);
+        }
+
+        window.onload = function() { refreshAt(0,0,0); } // Refreshes at midnight
+    </script>
+</head>
+<body>
+    <iframe id="slideshow" src="https://docs.google.com/presentation/d/e/YOUR_SLIDESHOW_ID/embed?start=true&loop=true&delayms=5000" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+</body>
+</html>
