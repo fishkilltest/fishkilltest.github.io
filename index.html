@@ -15,6 +15,7 @@
             width: 100%;
             height: 100%;
             position: relative;
+            background-color: black;
         }
         .slide {
             position: absolute;
@@ -27,7 +28,6 @@
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: black; /* background color when image doesn't cover full area */
         }
         .slide.active {
             opacity: 1;
@@ -96,10 +96,40 @@
             }, timeout);
         }
 
+        function enterFullscreen() {
+            if (slideshow.requestFullscreen) {
+                slideshow.requestFullscreen();
+            } else if (slideshow.mozRequestFullScreen) { // Firefox
+                slideshow.mozRequestFullScreen();
+            } else if (slideshow.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                slideshow.webkitRequestFullscreen();
+            } else if (slideshow.msRequestFullscreen) { // IE/Edge
+                slideshow.msRequestFullscreen();
+            }
+        }
+
         window.onload = function() {
             startSlideshow();
             refreshAt(0,0,0); // Refreshes at midnight
+            
+            // Enter fullscreen mode after a short delay
+            setTimeout(enterFullscreen, 1000);
+
+            // Re-enter fullscreen mode if it's exited
+            document.addEventListener('fullscreenchange', function() {
+                if (!document.fullscreenElement) {
+                    setTimeout(enterFullscreen, 1000);
+                }
+            });
         }
+
+        // Prevent exiting fullscreen with Esc key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                enterFullscreen();
+            }
+        });
     </script>
 </body>
 </html>
