@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Slideshow</title>
+    <title>28-Day Rotating Multi-page PDF Slideshow</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
     <style>
         body, html {
@@ -22,22 +22,30 @@
     <canvas id="pdf-viewer"></canvas>
 
     <script>
-        // List your PDF filenames here
-        const pdfFiles = [
-            'FishkillMonitorBreakfast.pdf',
-            'FishkillMonitorLunch.pdf',
-            'FishkillMonitorDinner.pdf'
+        // Define all 28 PDF files
+        const allSlides = [
+            'set1.pdf', 'set2.pdf', 'set3.pdf', 'set4.pdf', 'set5.pdf', 'set6.pdf', 'set7.pdf',
+            'set8.pdf', 'set9.pdf', 'set10.pdf', 'set11.pdf', 'set12.pdf', 'set13.pdf', 'set14.pdf',
+            'set15.pdf', 'set16.pdf', 'set17.pdf', 'set18.pdf', 'set19.pdf', 'set20.pdf', 'set21.pdf',
+            'set22.pdf', 'set23.pdf', 'set24.pdf', 'set25.pdf', 'set26.pdf', 'set27.pdf', 'set28.pdf'
         ];
 
-        let currentPdfIndex = 0;
         let currentPage = 1;
         let pdf = null;
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
 
+        function getPdfForToday() {
+            const startDate = new Date('2024-09-08'); // Your start date
+            const today = new Date();
+            const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            return allSlides[daysSinceStart % 28];
+        }
+
         async function loadAndRenderPdf(pdfUrl) {
             const loadingTask = pdfjsLib.getDocument(pdfUrl);
             pdf = await loadingTask.promise;
+            currentPage = 1;
             renderPage();
         }
 
@@ -59,37 +67,38 @@
         }
 
         function nextSlide() {
-            currentPdfIndex = (currentPdfIndex + 1) % pdfFiles.length;
-            loadAndRenderPdf(pdfFiles[currentPdfIndex]);
-        }
-
-        function startSlideshow() {
-            loadAndRenderPdf(pdfFiles[currentPdfIndex]);
-            setInterval(nextSlide, 5000); // Change slide every 5 seconds
-        }
-
-        function refreshAt(hours, minutes, seconds) {
-            var now = new Date();
-            var then = new Date();
-
-            if(now.getHours() > hours ||
-               (now.getHours() == hours && now.getMinutes() > minutes) ||
-                (now.getHours() == hours && now.getMinutes() == minutes && now.getSeconds() >= seconds)) {
-                then.setDate(now.getDate() + 1);
+            if (currentPage < pdf.numPages) {
+                currentPage++;
+            } else {
+                currentPage = 1;
             }
-            then.setHours(hours);
-            then.setMinutes(minutes);
-            then.setSeconds(seconds);
+            renderPage();
+        }
 
-            var timeout = (then.getTime() - now.getTime());
-            setTimeout(function() { 
+        async function startSlideshow() {
+            const todayPdf = getPdfForToday();
+            await loadAndRenderPdf(todayPdf);
+            setInterval(nextSlide, 7000); // Change slide every 7 seconds
+        }
+
+        function refreshAtMidnight() {
+            const now = new Date();
+            const night = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + 1, // the next day
+                0, 0, 0 // at 00:00:00 hours
+            );
+            const msToMidnight = night.getTime() - now.getTime();
+
+            setTimeout(function() {
                 window.location.reload();
-            }, timeout);
+            }, msToMidnight);
         }
 
         window.onload = function() {
             startSlideshow();
-            refreshAt(0,0,0); // Refreshes at midnight
+            refreshAtMidnight();
         }
     </script>
 </body>
