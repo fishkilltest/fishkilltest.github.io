@@ -12,14 +12,23 @@
             height: 100%;
             overflow: hidden;
         }
-        #pdf-viewer {
+        #pdf-container {
             width: 100%;
             height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #pdf-viewer {
+            max-width: 100%;
+            max-height: 100%;
         }
     </style>
 </head>
 <body>
-    <canvas id="pdf-viewer"></canvas>
+    <div id="pdf-container">
+        <canvas id="pdf-viewer"></canvas>
+    </div>
 
     <script>
         // Define all 28 PDF files
@@ -42,7 +51,7 @@ const allSlides = [
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
 
         function getPdfForToday() {
-            const startDate = new Date('2024-09-08'); // Your start date
+            const startDate = new Date('2024-09-08');
             const today = new Date();
             const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
             return allSlides[daysSinceStart % 28];
@@ -57,13 +66,20 @@ const allSlides = [
 
         async function renderPage() {
             const page = await pdf.getPage(currentPage);
-            const scale = 1.5;
+            const pixelRatio = window.devicePixelRatio || 1;
+            const scale = 2 * pixelRatio; // Increased base scale and accounting for pixel ratio
             const viewport = page.getViewport({ scale });
 
             const canvas = document.getElementById('pdf-viewer');
             const context = canvas.getContext('2d');
+
+            // Set canvas size to match viewport
             canvas.height = viewport.height;
             canvas.width = viewport.width;
+
+            // Scale down canvas with CSS
+            canvas.style.width = `${viewport.width / pixelRatio}px`;
+            canvas.style.height = `${viewport.height / pixelRatio}px`;
 
             const renderContext = {
                 canvasContext: context,
@@ -92,8 +108,8 @@ const allSlides = [
             const night = new Date(
                 now.getFullYear(),
                 now.getMonth(),
-                now.getDate() + 1, // the next day
-                0, 0, 0 // at 00:00:00 hours
+                now.getDate() + 1,
+                0, 0, 0
             );
             const msToMidnight = night.getTime() - now.getTime();
 
@@ -102,9 +118,16 @@ const allSlides = [
             }, msToMidnight);
         }
 
+        function handleResize() {
+            if (pdf) {
+                renderPage();
+            }
+        }
+
         window.onload = function() {
             startSlideshow();
             refreshAtMidnight();
+            window.addEventListener('resize', handleResize);
         }
     </script>
 </body>
