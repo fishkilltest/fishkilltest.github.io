@@ -41,18 +41,18 @@
 
     <script>
         // Define all 28 PDF files
-const allSlides = [
-    'Fishkill Fall Winter Menus/set1.pdf', 'Fishkill Fall Winter Menus/set2.pdf', 'Fishkill Fall Winter Menus/set3.pdf', 
-    'Fishkill Fall Winter Menus/set4.pdf', 'Fishkill Fall Winter Menus/set5.pdf', 'Fishkill Fall Winter Menus/set6.pdf', 
-    'Fishkill Fall Winter Menus/set7.pdf', 'Fishkill Fall Winter Menus/set8.pdf', 'Fishkill Fall Winter Menus/set9.pdf', 
-    'Fishkill Fall Winter Menus/set10.pdf', 'Fishkill Fall Winter Menus/set11.pdf', 'Fishkill Fall Winter Menus/set12.pdf', 
-    'Fishkill Fall Winter Menus/set13.pdf', 'Fishkill Fall Winter Menus/set14.pdf', 'Fishkill Fall Winter Menus/set15.pdf', 
-    'Fishkill Fall Winter Menus/set16.pdf', 'Fishkill Fall Winter Menus/set17.pdf', 'Fishkill Fall Winter Menus/set18.pdf', 
-    'Fishkill Fall Winter Menus/set19.pdf', 'Fishkill Fall Winter Menus/set20.pdf', 'Fishkill Fall Winter Menus/set21.pdf', 
-    'Fishkill Fall Winter Menus/set22.pdf', 'Fishkill Fall Winter Menus/set23.pdf', 'Fishkill Fall Winter Menus/set24.pdf', 
-    'Fishkill Fall Winter Menus/set25.pdf', 'Fishkill Fall Winter Menus/set26.pdf', 'Fishkill Fall Winter Menus/set27.pdf', 
-    'Fishkill Fall Winter Menus/set28.pdf'
-];
+        const allSlides = [
+            'Fishkill Fall Winter Menus/set1.pdf', 'Fishkill Fall Winter Menus/set2.pdf', 'Fishkill Fall Winter Menus/set3.pdf', 
+            'Fishkill Fall Winter Menus/set4.pdf', 'Fishkill Fall Winter Menus/set5.pdf', 'Fishkill Fall Winter Menus/set6.pdf', 
+            'Fishkill Fall Winter Menus/set7.pdf', 'Fishkill Fall Winter Menus/set8.pdf', 'Fishkill Fall Winter Menus/set9.pdf', 
+            'Fishkill Fall Winter Menus/set10.pdf', 'Fishkill Fall Winter Menus/set11.pdf', 'Fishkill Fall Winter Menus/set12.pdf', 
+            'Fishkill Fall Winter Menus/set13.pdf', 'Fishkill Fall Winter Menus/set14.pdf', 'Fishkill Fall Winter Menus/set15.pdf', 
+            'Fishkill Fall Winter Menus/set16.pdf', 'Fishkill Fall Winter Menus/set17.pdf', 'Fishkill Fall Winter Menus/set18.pdf', 
+            'Fishkill Fall Winter Menus/set19.pdf', 'Fishkill Fall Winter Menus/set20.pdf', 'Fishkill Fall Winter Menus/set21.pdf', 
+            'Fishkill Fall Winter Menus/set22.pdf', 'Fishkill Fall Winter Menus/set23.pdf', 'Fishkill Fall Winter Menus/set24.pdf', 
+            'Fishkill Fall Winter Menus/set25.pdf', 'Fishkill Fall Winter Menus/set26.pdf', 'Fishkill Fall Winter Menus/set27.pdf', 
+            'Fishkill Fall Winter Menus/set28.pdf'
+        ];
 
         let currentPage = 1;
         let pdf = null;
@@ -132,8 +132,19 @@ const allSlides = [
             const msToMidnight = night.getTime() - now.getTime();
 
             setTimeout(function() {
-                window.location.reload();
+                location.reload();
             }, msToMidnight);
+        }
+
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { // Safari
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { // IE11
+                elem.msRequestFullscreen();
+            }
         }
 
         function handleResize() {
@@ -146,6 +157,21 @@ const allSlides = [
             startSlideshow();
             refreshAtMidnight();
             window.addEventListener('resize', handleResize);
+            enterFullscreen();
+        }
+
+        // Reenter fullscreen if the page is reloaded
+        if (document.addEventListener) {
+            document.addEventListener('webkitfullscreenchange', exitHandler, false);
+            document.addEventListener('mozfullscreenchange', exitHandler, false);
+            document.addEventListener('fullscreenchange', exitHandler, false);
+            document.addEventListener('MSFullscreenChange', exitHandler, false);
+        }
+
+        function exitHandler() {
+            if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+                enterFullscreen();
+            }
         }
     </script>
 </body>
