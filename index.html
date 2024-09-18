@@ -61,9 +61,18 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
 
         function getPdfForToday() {
-            const startDate = new Date('2024-09-08');
-            const today = new Date();
-            const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            const startDate = new Date('2024-09-08T00:00:00-04:00'); // 12:00 AM ET on Sept 8, 2024
+            const now = new Date();
+            
+            // Convert current time to Eastern Time
+            const etNow = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
+            
+            // If it's before 12:00 AM ET, use the previous day
+            if (etNow.getHours() < 12) {
+                etNow.setDate(etNow.getDate() - 1);
+            }
+            
+            const daysSinceStart = Math.floor((etNow - startDate) / (1000 * 60 * 60 * 24));
             return allSlides[daysSinceStart % 28];
         }
 
