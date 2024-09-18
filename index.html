@@ -67,10 +67,8 @@
             // Convert current time to Eastern Time
             const etNow = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
             
-            // If it's before 12:00 AM ET, use the previous day
-            if (etNow.getHours() < 12) {
-                etNow.setDate(etNow.getDate() - 1);
-            }
+            // Reset the time to midnight
+            etNow.setHours(0, 0, 0, 0);
             
             const daysSinceStart = Math.floor((etNow - startDate) / (1000 * 60 * 60 * 24));
             return allSlides[daysSinceStart % 28];
@@ -132,13 +130,14 @@
 
         function refreshAtMidnight() {
             const now = new Date();
+            const etNow = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
             const night = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate() + 1,
+                etNow.getFullYear(),
+                etNow.getMonth(),
+                etNow.getDate() + 1,
                 0, 0, 0
             );
-            const msToMidnight = night.getTime() - now.getTime();
+            const msToMidnight = night.getTime() - etNow.getTime();
 
             setTimeout(function() {
                 location.reload();
